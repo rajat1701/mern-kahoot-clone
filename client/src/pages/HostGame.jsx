@@ -1,294 +1,36 @@
-// // import React, { useEffect, useRef, useState } from "react";
-// // import { useParams, Link } from "react-router-dom";
-// // import { useSocket } from "../components/useSocket";
-
-// // export default function HostGame() {
-// //   const { code } = useParams();
-// //   const socket = useSocket();
-// //   const [players, setPlayers] = useState([]);
-// //   const [leaderboard, setLeaderboard] = useState([]);
-// //   const [question, setQuestion] = useState(null);
-
-// //   useEffect(() => {
-// //     const onPlayers = (payload) => setPlayers(payload.players || []);
-// //     const onBoard = (board) => setLeaderboard(board);
-// //     const onStart = (q) => setQuestion(q);
-// //     const onEnd = (p) => setQuestion(null);
-
-// //     socket.on("host:players_update", onPlayers);
-// //     socket.on("host:leaderboard", onBoard);
-// //     socket.on("question:start", onStart);
-// //     socket.on("question:end", onEnd);
-
-// //     return () => {
-// //       socket.off("host:players_update", onPlayers);
-// //       socket.off("host:leaderboard", onBoard);
-// //       socket.off("question:start", onStart);
-// //       socket.off("question:end", onEnd);
-// //     }
-// //   }, [socket]);
-
-// //   function nextQ() {
-// //     socket.emit("host:next_question", { roomCode: code });
-// //   }
-
-// //   return (
-// //     <div>
-// //       <h2>Host Room: {code}</h2>
-// //       <p>Share this code with players. They should open the Join tab.</p>
-// //       <button onClick={nextQ}>{question ? "Next Question" : "Start Game"}</button>
-// //       <h3>Players ({players.length})</h3>
-// //       <ul>{players.map((p,i)=>(<li key={i}>{p.name} — {p.score}</li>))}</ul>
-// //       <h3>Leaderboard</h3>
-// //       <ol>{leaderboard.map((p,i)=>(<li key={i}>{p.name} — {p.score}</li>))}</ol>
-// //       {question && (
-// //         <div style={{ border: "1px solid #ddd", padding: 12, marginTop: 12 }}>
-// //           <h3>Q: {question.text}</h3>
-// //           <ul>{question.choices.map((c,i)=>(<li key={i}>{i+1}. {c}</li>))}</ul>
-// //         </div>
-// //       )}
-// //       <p><Link to="/">Back</Link></p>
-// //     </div>
-// //   )
-// // }
-
-
-// import React, { useEffect, useState } from "react";
-// import { useParams, Link } from "react-router-dom";
-// import { useSocket } from "../components/useSocket";
-
-// export default function HostGame() {
-//   const { code } = useParams();
-//   const socket = useSocket(); // will be null until connected
-//   const [players, setPlayers] = useState([]);
-//   const [leaderboard, setLeaderboard] = useState([]);
-//   const [question, setQuestion] = useState(null);
-
-//   useEffect(() => {
-//     if (!socket) return; // wait until socket is ready
-
-//     // Socket event handlers
-//     const onPlayers = (payload) => setPlayers(payload.players || []);
-//     const onBoard = (board) => setLeaderboard(board);
-//     const onStart = (q) => setQuestion(q);
-//     const onEnd = () => setQuestion(null);
-
-//     socket.on("host:players_update", onPlayers);
-//     socket.on("host:leaderboard", onBoard);
-//     socket.on("question:start", onStart);
-//     socket.on("question:end", onEnd);
-
-//     // Cleanup on unmount
-//     return () => {
-//       socket.off("host:players_update", onPlayers);
-//       socket.off("host:leaderboard", onBoard);
-//       socket.off("question:start", onStart);
-//       socket.off("question:end", onEnd);
-//     };
-//   }, [socket]);
-
-//   const nextQ = () => {
-//     if (!socket) return;
-//     socket.emit("host:next_question", { roomCode: code });
-//   };
-
-//   // Loading state while connecting
-//   if (!socket) {
-//     return <p>Connecting to server...</p>;
-//   }
-
-//   return (
-//     <div>
-//       <h2>Host Room: {code}</h2>
-//       <p>Share this code with players. They should open the Join tab.</p>
-
-//       <button onClick={nextQ}>
-//         {question ? "Next Question" : "Start Game"}
-//       </button>
-
-//       <h3>Players ({players.length})</h3>
-//       <ul>
-//         {players.map((p, i) => (
-//           <li key={i}>
-//             {p.name} — {p.score}
-//           </li>
-//         ))}
-//       </ul>
-
-//       <h3>Leaderboard</h3>
-//       <ol>
-//         {leaderboard.map((p, i) => (
-//           <li key={i}>
-//             {p.name} — {p.score}
-//           </li>
-//         ))}
-//       </ol>
-
-//       {question && (
-//         <div style={{ border: "1px solid #ddd", padding: 12, marginTop: 12 }}>
-//           <h3>Q: {question.text}</h3>
-//           <ul>
-//             {question.choices.map((c, i) => (
-//               <li key={i}>
-//                 {i + 1}. {c}
-//               </li>
-//             ))}
-//           </ul>
-//         </div>
-//       )}
-
-//       <p>
-//         <Link to="/">Back</Link>
-//       </p>
-//     </div>
-//   );
-// }
-
-
-// import React, { useEffect, useState } from "react";
-// import { useParams, Link } from "react-router-dom";
-// import { useSocket } from "../components/useSocket";
-
-// export default function HostGame() {
-//   const { code } = useParams();
-//   const socket = useSocket(); // null until connected
-//   const [players, setPlayers] = useState([]);
-//   const [leaderboard, setLeaderboard] = useState([]);
-//   const [question, setQuestion] = useState(null);
-
-//   useEffect(() => {
-//     if (!socket) return; // wait until socket is ready
-
-//     const onPlayers = (payload) => setPlayers(payload.players || []);
-//     const onBoard = (board) => setLeaderboard(board);
-//     const onStart = (q) => setQuestion(q);
-//     const onEnd = () => setQuestion(null);
-
-//     socket.on("host:players_update", onPlayers);
-//     socket.on("host:leaderboard", onBoard);
-//     socket.on("question:start", onStart);
-//     socket.on("question:end", onEnd);
-
-//     return () => {
-//       socket.off("host:players_update", onPlayers);
-//       socket.off("host:leaderboard", onBoard);
-//       socket.off("question:start", onStart);
-//       socket.off("question:end", onEnd);
-//     };
-//   }, [socket]);
-
-//   const nextQ = () => {
-//     if (!socket) return;
-//     socket.emit("host:next_question", { roomCode: code });
-//   };
-
-//   // Loading state
-//   if (!socket) return <p>Connecting to server...</p>;
-
-//   return (
-//     <div>
-//       <h2>Host Room: {code}</h2>
-//       <p>Share this code with players. They should open the Join tab.</p>
-
-//       <button onClick={nextQ}>
-//         {question ? "Next Question" : "Start Game"}
-//       </button>
-
-//       <h3>Players ({players.length})</h3>
-//       <ul>
-//         {players.map((p, i) => (
-//           <li key={i}>
-//             {p.name} — {p.score}
-//           </li>
-//         ))}
-//       </ul>
-
-//       <h3>Leaderboard</h3>
-//       <ol>
-//         {leaderboard.map((p, i) => (
-//           <li key={i}>
-//             {p.name} — {p.score}
-//           </li>
-//         ))}
-//       </ol>
-
-//       {question && (
-//         <div style={{ border: "1px solid #ddd", padding: 12, marginTop: 12 }}>
-//           <h3>Q: {question.text}</h3>
-//           <ul>
-//             {question.choices.map((c, i) => (
-//               <li key={i}>
-//                 {i + 1}. {c}
-//               </li>
-//             ))}
-//           </ul>
-//         </div>
-//       )}
-
-//       <p>
-//         <Link to="/">Back</Link>
-//       </p>
-//     </div>
-//   );
-// }
-
-
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
 import { useSocket } from "../components/useSocket";
-
-export default function HostGame() {
-  const { code } = useParams();
+import { Link } from "react-router-dom";
+export default function HostPage({ roomCode }) {
   const socket = useSocket();
   const [players, setPlayers] = useState([]);
-  const [leaderboard, setLeaderboard] = useState([]);
-  const [question, setQuestion] = useState(null);
-
+  const [lobbyCount, setLobbyCount] = useState(0);
+  const [quiz, setQuiz] = useState(null);
   useEffect(() => {
-    if (!socket) return; // wait for socket to connect
-
-    const onPlayers = (payload) => setPlayers(payload.players || []);
-    const onBoard = (board) => setLeaderboard(board);
-    const onStart = (q) => setQuestion(q);
-    const onEnd = () => setQuestion(null);
-
-    socket.on("host:players_update", onPlayers);
-    socket.on("host:leaderboard", onBoard);
-    socket.on("question:start", onStart);
-    socket.on("question:end", onEnd);
-
+    if (!socket) return;
+    socket.emit('host:create_room', { quiz });
+    socket.on('host:room_created', ({ roomCode: rc }) => { console.log('Room created server-side:', rc); });
+    socket.on("host:players_update", ({ players }) => setPlayers(players));
+    socket.on("host:leaderboard", (board) => setPlayers(board));
+    socket.on("lobby:update", ({ count }) => setLobbyCount(count));
+    socket.on("game:closed", () => { setPlayers([]); setLobbyCount(0); });
     return () => {
-      socket.off("host:players_update", onPlayers);
-      socket.off("host:leaderboard", onBoard);
-      socket.off("question:start", onStart);
-      socket.off("question:end", onEnd);
+      socket.off('host:room_created');
+      socket.off("host:players_update");
+      socket.off("host:leaderboard");
+      socket.off("lobby:update");
+      socket.off("game:closed");
     };
   }, [socket]);
-
-  function nextQ() {
-    if (!socket) return;
-    socket.emit("host:next_question", { roomCode: code });
-  }
-
+  function startGame() { if (!socket) return; socket.emit("host:next_question", { roomCode }); }
   return (
     <div>
-      <h2>Host Room: {code}</h2>
-      <p>Share this code with players. They should open the Join tab.</p>
-      <button onClick={nextQ}>{question ? "Next Question" : "Start Game"}</button>
-
-      <h3>Players ({players.length})</h3>
-      <ul>{players.map((p, i) => (<li key={i}>{p.name} — {p.score}</li>))}</ul>
-
-      <h3>Leaderboard</h3>
-      <ol>{leaderboard.map((p, i) => (<li key={i}>{p.name} — {p.score}</li>))}</ol>
-
-      {question && (
-        <div style={{ border: "1px solid #ddd", padding: 12, marginTop: 12 }}>
-          <h3>Q: {question.text}</h3>
-          <ul>{question.choices.map((c, i) => (<li key={i}>{i + 1}. {c}</li>))}</ul>
-        </div>
-      )}
-
+      <h2>Hosting Room: {roomCode}</h2>
+      <p>Share this code with players: <b>{roomCode}</b></p>
+      <p>Players in lobby: {lobbyCount}</p>
+      <button onClick={startGame}>Start Game</button>
+      <h3>Players</h3>
+      {players.length === 0 ? <p>No players yet...</p> : (<ul>{players.map((p, i) => (<li key={i}>{p.name} — {p.score}</li>))}</ul>)}
       <p><Link to="/">Back</Link></p>
     </div>
   );

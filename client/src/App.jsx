@@ -1,24 +1,28 @@
-import React from 'react'
-import { Routes, Route, Link } from 'react-router-dom'
-import Host from './pages/Host.jsx'
-import Join from './pages/Join.jsx'
-import HostGame from './pages/HostGame.jsx'
-import PlayerGame from './pages/PlayerGame.jsx'
+import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
+import HostGame from "./HostGame";
+import JoinGame from "./JoinGame";
+import PlayerGame from "./PlayerGame";
 
 export default function App() {
   return (
-    <div style={{ fontFamily: "system-ui", padding: 16 }}>
-      <header style={{ display: "flex", gap: 12, alignItems: "center" }}>
-        <h1 style={{ marginRight: "auto" }}>Kahoot Clone</h1>
-        <Link to="/">Host</Link>
-        <Link to="/join">Join</Link>
-      </header>
+    <BrowserRouter>
+      <h1>Kahoot Clone</h1>
       <Routes>
-        <Route path="/" element={<Host />} />
-        <Route path="/join" element={<Join />} />
-        <Route path="/host/:code" element={<HostGame />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/host" element={<HostGame />} />
+        <Route path="/join" element={<JoinGame />} />
         <Route path="/play/:code" element={<PlayerGame />} />
       </Routes>
+    </BrowserRouter>
+  );
+}
+
+function Home() {
+  return (
+    <div>
+      <h2>Welcome</h2>
+      <Link to="/host">Host a game</Link><br />
+      <Link to="/join">Join a game</Link>
     </div>
-  )
+  );
 }
