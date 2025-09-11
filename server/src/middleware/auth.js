@@ -1,14 +1,15 @@
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-export function authRequired(req, res, next) {
-  const header = req.headers.authorization || "";
-  const token = header.startsWith("Bearer ") ? header.slice(7) : null;
-  if (!token) return res.status(401).json({ error: "Missing token" });
+export const authMiddleware = async (req, res, next) => {
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = payload;
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token provided" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id).select("-password");
     next();
-  } catch (e) {
-    return res.status(401).json({ error: "Invalid token" });
+  } catch (err) {
+    res.status(401).json({ message: "Invalid token" });
   }
-}
+};
