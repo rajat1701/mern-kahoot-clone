@@ -6,7 +6,7 @@ import PlayerGame from "./PlayerGame";
 export default function App() {
   return (
     <BrowserRouter>
-      <h1>Kahoot Clone</h1>
+      <h1>ZAPPY</h1>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/host" element={<HostGame />} />
