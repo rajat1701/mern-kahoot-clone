@@ -333,6 +333,155 @@
 //   );
 // }
 
+// import React, { useState } from "react";
+// import { Editor } from "@tinymce/tinymce-react";
+
+// export default function QuizEditor({ onSave }) {
+//   const [questions, setQuestions] = useState([]);
+//   const [currentQuestion, setCurrentQuestion] = useState({
+//     text: "",
+//     choices: ["", "", "", ""],
+//     correctIndices: [], // This will now be an array
+//     timeLimitSec: 15,
+//   });
+
+//   const handleInputChange = (e) => {
+//     const { name, value } = e.target;
+//     // For time limit, ensure it's a number
+//     if (name === "timeLimitSec") {
+//       setCurrentQuestion({ ...currentQuestion, [name]: Number(value) });
+//     } else {
+//       setCurrentQuestion({ ...currentQuestion, [name]: value });
+//     }
+//   };
+
+//   const handleEditorChange = (content) => {
+//     setCurrentQuestion({ ...currentQuestion, text: content });
+
+//   };
+
+//   const handleChoiceChange = (index, value) => {
+//     const newChoices = [...currentQuestion.choices];
+//     newChoices[index] = value;
+//     setCurrentQuestion({ ...currentQuestion, choices: newChoices });
+//   };
+
+//   const handleCorrectAnswerChange = (index) => {
+//     const { correctIndices } = currentQuestion;
+//     const newCorrectIndices = correctIndices.includes(index)
+//       ? correctIndices.filter((i) => i !== index)
+//       : [...correctIndices, index];
+
+//     setCurrentQuestion({ ...currentQuestion, correctIndices: newCorrectIndices });
+//   };
+
+//   const addQuestion = () => {
+//     if (!currentQuestion.text || currentQuestion.choices.some((c) => !c) || currentQuestion.correctIndices.length === 0) {
+//       alert("Please fill in the question, all four choices, and select at least one correct answer.");
+//       return;
+//     }
+//     setQuestions([...questions, currentQuestion]);
+//     setCurrentQuestion({
+//       text: "",
+//       choices: ["", "", "", ""],
+//       correctIndices: [],
+//       timeLimitSec: 15,
+//     });
+//   };
+
+//   // const endQuiz = () => {
+//   //   if (questions.length === 0) {
+//   //     alert("Please add at least one question before ending the quiz.");
+//   //     return;
+//   //   }
+//   //   onSave({ questions });
+//   // };
+
+
+//   const endQuiz = () => {
+//     // Check if the current question is valid and has not been added yet
+//     const isCurrentQuestionValid = 
+//         currentQuestion.text && 
+//         currentQuestion.choices.every(c => c) && 
+//         currentQuestion.correctIndices.length > 0;
+
+//     let finalQuestions = [...questions];
+
+//     if (isCurrentQuestionValid) {
+//         finalQuestions.push(currentQuestion);
+//     }
+    
+//     if (finalQuestions.length === 0) {
+//         alert("Please add at least one question before ending the quiz.");
+//         return;
+//     }
+    
+//     // Send the combined list of questions to the server
+//     onSave({ questions: finalQuestions });
+// };
+
+
+//   return (
+//     <div>
+//       <h3>Add Questions ({questions.length})</h3>
+//       <div>
+//         <label>Question Text:</label>
+//         <Editor
+//           apiKey="0gn1nl2pcgdtjpnb3b8iyodwu7az8ldbkqxpa75qztjwti0q" // api key from TinyMCE 
+//           // initialValue={currentQuestion.text});
+          
+//           onEditorChange={handleEditorChange}
+//           init={{
+//             height: 300,
+//             menubar: false,
+//             plugins: "link lists image code fullscreen emoticons",
+//             toolbar:
+//               "undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | fullscreen | code",
+//           }}
+//         />
+//       </div>
+//       <div>
+//         <label>
+//           Time Limit (sec):
+//           <input
+//             type="number"
+//             name="timeLimitSec"
+//             value={currentQuestion.timeLimitSec}
+//             onChange={handleInputChange}
+//             min="5"
+//             max="180"
+//           />
+//         </label>
+//       </div>
+//       <h4>Answer Choices:</h4>
+//       {currentQuestion.choices.map((choice, index) => (
+//         <div key={index}>
+//           <label>
+//             <input
+//               type="checkbox"
+//               checked={currentQuestion.correctIndices.includes(index)}
+//               onChange={() => handleCorrectAnswerChange(index)}
+//             />
+//             Option {index + 1}:
+//             <input
+//               type="text"
+//               value={choice}
+//               onChange={(e) => handleChoiceChange(index, e.target.value)}
+//             />
+//           </label>
+//         </div>
+//       ))}
+//       <div style={{ marginTop: "1rem" }}>
+//         <button onClick={addQuestion}>Add Question</button>
+//         <button onClick={endQuiz} disabled={questions.length === 0}>
+//           End Quiz and Create Room
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+
 import React, { useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 
@@ -341,13 +490,12 @@ export default function QuizEditor({ onSave }) {
   const [currentQuestion, setCurrentQuestion] = useState({
     text: "",
     choices: ["", "", "", ""],
-    correctIndices: [], // This will now be an array
+    correctIndices: [],
     timeLimitSec: 15,
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    // For time limit, ensure it's a number
     if (name === "timeLimitSec") {
       setCurrentQuestion({ ...currentQuestion, [name]: Number(value) });
     } else {
@@ -357,7 +505,6 @@ export default function QuizEditor({ onSave }) {
 
   const handleEditorChange = (content) => {
     setCurrentQuestion({ ...currentQuestion, text: content });
-
   };
 
   const handleChoiceChange = (index, value) => {
@@ -371,7 +518,6 @@ export default function QuizEditor({ onSave }) {
     const newCorrectIndices = correctIndices.includes(index)
       ? correctIndices.filter((i) => i !== index)
       : [...correctIndices, index];
-
     setCurrentQuestion({ ...currentQuestion, correctIndices: newCorrectIndices });
   };
 
@@ -390,11 +536,23 @@ export default function QuizEditor({ onSave }) {
   };
 
   const endQuiz = () => {
-    if (questions.length === 0) {
-      alert("Please add at least one question before ending the quiz.");
-      return;
+    const isCurrentQuestionValid = 
+        currentQuestion.text && 
+        currentQuestion.choices.every(c => c) && 
+        currentQuestion.correctIndices.length > 0;
+    
+    let finalQuestions = [...questions];
+
+    if (isCurrentQuestionValid) {
+        finalQuestions.push(currentQuestion);
     }
-    onSave({ questions });
+    
+    if (finalQuestions.length === 0) {
+        alert("Please add at least one question before ending the quiz.");
+        return;
+    }
+    
+    onSave({ questions: finalQuestions });
   };
 
   return (
@@ -403,9 +561,9 @@ export default function QuizEditor({ onSave }) {
       <div>
         <label>Question Text:</label>
         <Editor
-          apiKey="0gn1nl2pcgdtjpnb3b8iyodwu7az8ldbkqxpa75qztjwti0q" // api key from TinyMCE 
-          // initialValue={currentQuestion.text});
-          
+          apiKey="0gn1nl2pcgdtjpnb3b8iyodwu7az8ldbkqxpa75qztjwti0q" // Make sure to use your own API key
+          key={questions.length} // <-- Key change here to force re-render
+          //initialValue={currentQuestion.text}
           onEditorChange={handleEditorChange}
           init={{
             height: 300,
