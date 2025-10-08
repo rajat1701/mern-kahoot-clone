@@ -756,11 +756,193 @@
 
 
 
-import { useEffect, useMemo, useState } from "react";
-import { useParams, useSearchParams, Link } from "react-router-dom";
-import { useSocket } from "./useSocket";
+// import { useEffect, useMemo, useState } from "react";
+// import { useParams, useSearchParams, Link } from "react-router-dom";
+// import { useSocket } from "./useSocket";
+
+// // Import Material-UI components
+// import Radio from '@mui/material/Radio';
+// import RadioGroup from '@mui/material/RadioGroup';
+// import FormControlLabel from '@mui/material/FormControlLabel';
+// import FormControl from '@mui/material/FormControl';
+// import FormLabel from '@mui/material/FormLabel';
+// import Checkbox from '@mui/material/Checkbox';
+// import FormGroup from '@mui/material/FormGroup';
+// import Button from '@mui/material/Button';
+// import Box from '@mui/material/Box';
+// import Typography from '@mui/material/Typography';
+
+// export default function PlayerGame() {
+//   const { code } = useParams();
+//   const [params] = useSearchParams();
+//   const name = useMemo(()=>params.get("name") || "Player", [params]);
+//   const socket = useSocket();
+//   const [state, setState] = useState({ phase: "lobby" });
+//   const [selectedAnswers, setSelectedAnswers] = useState([]);
+//   const [selectedRadioAnswer, setSelectedRadioAnswer] = useState(null);
+//   const [result, setResult] = useState(null);
+//   const [timer, setTimer] = useState(0);
+
+//   useEffect(() => {
+//     if (!socket) return;
+//     socket.emit("player:join", { roomCode: code, name });
+
+//     const onLobby = ({ count }) => setState(prevState => ({ ...prevState, phase: "lobby", count }));
+    
+//     const onStart = (q) => {
+//       setState(prevState => ({ ...prevState, phase: "question", q }));
+//       setSelectedAnswers([]);
+//       setSelectedRadioAnswer(null);
+//       setResult(null);
+//       const ms = q.endsAt - Date.now();
+//       setTimer(Math.ceil(ms/1000));
+//     };
+
+//     const tick = setInterval(() => setTimer(t => Math.max(0,t-1)), 1000);
+    
+//     const onEnd = ({ correctIndices, leaderboard }) => {
+//       setState(prevState => ({ ...prevState, phase: "reveal", correctIndices, leaderboard }));
+//     };
+
+//     const onOver = ({ leaderboard }) => setState(prevState => ({ ...prevState, phase: "over", leaderboard }));
+//     const onAnswerRes = ({ correct }) => setResult(correct ? "Correct!" : "Wrong");
+
+//     socket.on("lobby:update", onLobby);
+//     socket.on("question:start", onStart);
+//     socket.on("question:end", onEnd);
+//     socket.on("game:over", onOver);
+//     socket.on("player:answer_result", onAnswerRes);
+
+//     return () => {
+//       clearInterval(tick);
+//       socket.off("lobby:update", onLobby);
+//       socket.off("question:start", onStart);
+//       socket.off("question:end", onEnd);
+//       socket.off("game:over", onOver);
+//       socket.off("player:answer_result", onAnswerRes);
+//     };
+//   }, [socket, code, name]);
+
+//   const handleCheckboxChange = (index) => {
+//     setSelectedAnswers(prevAnswers => 
+//       prevAnswers.includes(index) 
+//         ? prevAnswers.filter(i => i !== index) 
+//         : [...prevAnswers, index]
+//     );
+//   };
+
+//   const handleRadioChange = (event) => {
+//     setSelectedRadioAnswer(Number(event.target.value));
+//   };
+  
+//   const submitAnswers = () => {
+//     const q = state.q; 
+//     if (!q) return;
+
+//     if (q.hasMultipleAnswers) {
+//       if (selectedAnswers.length > 0) {
+//         const sortedAnswers = selectedAnswers.sort((a, b) => a - b);
+//         socket.emit("player:answer", { roomCode: code, choiceIndices: sortedAnswers });
+//       }
+//     } else {
+//       if (selectedRadioAnswer !== null) {
+//         socket.emit("player:answer", { roomCode: code, choiceIndices: [selectedRadioAnswer] });
+//       }
+//     }
+//   };
+
+//   const correctAnswersText = useMemo(() => {
+//     if (state.phase === "reveal" && state.q && state.correctIndices) {
+//       return state.correctIndices.map(index => state.q.choices[index]);
+//     }
+//     return [];
+//   }, [state]);
+
+//   return (
+//     <Box sx={{ p: 6 }}>  
+//       {state.phase === "lobby" && <Typography variant="body1">Waiting... Players: {state.count || 1}</Typography>}
+
+//       {state.phase === "question" && (
+//         <Box>
+//           <div dangerouslySetInnerHTML={{ __html: state.q.text }} />
+//           <Typography variant="body2" sx={{ mt: 2 }}>Time left: {timer}s</Typography>
+
+//           {state.q.hasMultipleAnswers ? (
+//             <FormGroup sx={{ mt: 2 }}>
+//               {state.q.choices.map((c, i) => (
+//                 <FormControlLabel
+//                   key={i}
+//                   control={
+//                     <Checkbox
+//                       checked={selectedAnswers.includes(i)}
+//                       onChange={() => handleCheckboxChange(i)}
+//                     />
+//                   }
+//                   label={c}
+//                 />
+//               ))}
+//             </FormGroup>
+//           ) : (
+//             <FormControl component="fieldset" sx={{ mt: 2 }}>
+//               <FormLabel component="legend">Select an Answer</FormLabel>
+//               <RadioGroup
+//                 aria-label="answers"
+//                 name="radio-buttons-group"
+//                 value={selectedRadioAnswer}
+//                 onChange={handleRadioChange}
+//               >
+//                 {state.q.choices.map((c, i) => (
+//                   <FormControlLabel
+//                     key={i}
+//                     value={i}
+//                     control={<Radio />}
+//                     label={c}
+//                   />
+//                 ))}
+//               </RadioGroup>
+//             </FormControl>
+//           )}
+
+//           <Button
+//             variant="contained"
+//             onClick={submitAnswers}
+//             disabled={(state.q.hasMultipleAnswers && selectedAnswers.length === 0) || (!state.q.hasMultipleAnswers && selectedRadioAnswer === null) || result !== null}
+//             sx={{ mt: 2 }}
+//           >
+//             Submit Answer
+//           </Button>
+
+//           {result && <Typography variant="body1" sx={{ mt: 2 }}>{result}</Typography>}
+//         </Box>
+//       )}
+
+//       {state.phase === "reveal" && (
+//         <Box>
+//           <Typography variant="h5">Correct answer(s):</Typography>
+//           <ul>
+//             {correctAnswersText.map((answer, i) => (
+//               <li key={i}>{answer}</li>
+//             ))}
+//           </ul>
+//           <Typography variant="h6" sx={{ mt: 2 }}>Leaderboard</Typography>
+//           <ol>{state.leaderboard.map((p,i)=><li key={i}>{p.name} — {p.score}</li>)}</ol>
+//         </Box>
+//       )}
+
+//       {state.phase === "over" && (
+//         <Box>
+//           <Typography variant="h5">Game over</Typography>
+//           <ol>{state.leaderboard.map((p,i)=><li key={i}>{p.name} — {p.score}</li>)}</ol>
+//           <Button variant="contained" component={Link} to="/join" sx={{ mt: 2 }}>Join another</Button>
+//         </Box>
+//       )}
+//     </Box>
+//   )
+// }
+
 
 // Import Material-UI components
+import { Box, Card, Typography, Button, Divider } from "@mui/material";
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -768,10 +950,9 @@ import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-
+import { useEffect, useMemo, useState } from "react";
+import { useParams, useSearchParams, Link } from "react-router-dom";
+import { useSocket } from "./useSocket";
 export default function PlayerGame() {
   const { code } = useParams();
   const [params] = useSearchParams();
@@ -858,16 +1039,23 @@ export default function PlayerGame() {
     return [];
   }, [state]);
 
+
   return (
-    <Box sx={{ p: 6 }}>  
-      {state.phase === "lobby" && <Typography variant="body1">Waiting... Players: {state.count || 1}</Typography>}
+    <Box className="flex flex-col items-center p-6 space-y-6">
+      <Card className="p-6 w-full max-w-xl bg-[#F8FAFC]/95 backdrop-blur-sm shadow-xl border border-[#BCCCDC]/40">
+        {state.phase === "lobby" && (
+          <Typography variant="h6" className="text-[#64748B] text-center">
+            Waiting for host... Players: {state.count || 1}
+          </Typography>
+        )}
 
-      {state.phase === "question" && (
-        <Box>
-          <div dangerouslySetInnerHTML={{ __html: state.q.text }} />
-          <Typography variant="body2" sx={{ mt: 2 }}>Time left: {timer}s</Typography>
-
-          {state.q.hasMultipleAnswers ? (
+        {state.phase === "question" && (
+          <Box>
+            <Typography variant="h6" className="text-[#334155] mb-2" dangerouslySetInnerHTML={{ __html: state.q.text }} />
+            <Typography variant="body2" className="text-[#64748B] mb-4">
+              Time left: {timer}s
+            </Typography>
+                      {state.q.hasMultipleAnswers ? (
             <FormGroup sx={{ mt: 2 }}>
               {state.q.choices.map((c, i) => (
                 <FormControlLabel
@@ -903,39 +1091,43 @@ export default function PlayerGame() {
             </FormControl>
           )}
 
-          <Button
-            variant="contained"
-            onClick={submitAnswers}
-            disabled={(state.q.hasMultipleAnswers && selectedAnswers.length === 0) || (!state.q.hasMultipleAnswers && selectedRadioAnswer === null) || result !== null}
-            sx={{ mt: 2 }}
-          >
-            Submit Answer
-          </Button>
+            <Button
+              variant="contained"
+              onClick={submitAnswers}
+              sx={{ mt: 2, backgroundColor: "#64748B", "&:hover": { backgroundColor: "#475569" } }}
+            >
+              Submit
+            </Button>
 
-          {result && <Typography variant="body1" sx={{ mt: 2 }}>{result}</Typography>}
-        </Box>
-      )}
+            {result && <Typography className="mt-4 text-center">{result}</Typography>}
+          </Box>
+        )}
 
-      {state.phase === "reveal" && (
-        <Box>
-          <Typography variant="h5">Correct answer(s):</Typography>
-          <ul>
-            {correctAnswersText.map((answer, i) => (
-              <li key={i}>{answer}</li>
-            ))}
-          </ul>
-          <Typography variant="h6" sx={{ mt: 2 }}>Leaderboard</Typography>
-          <ol>{state.leaderboard.map((p,i)=><li key={i}>{p.name} — {p.score}</li>)}</ol>
-        </Box>
-      )}
+        {state.phase === "reveal" && (
+          <Box className="text-center">
+            <Typography variant="h6">Correct answer(s):</Typography>
+            <ul>
+              {correctAnswersText.map((a, i) => (
+                <li key={i}>{a}</li>
+              ))}
+            </ul>
+            <Divider className="my-3" />
+            <Typography variant="h6">Leaderboard</Typography>
+            <ol>{state.leaderboard.map((p, i) => <li key={i}>{p.name} — {p.score}</li>)}</ol>
+          </Box>
+        )}
 
-      {state.phase === "over" && (
-        <Box>
-          <Typography variant="h5">Game over</Typography>
-          <ol>{state.leaderboard.map((p,i)=><li key={i}>{p.name} — {p.score}</li>)}</ol>
-          <Button variant="contained" component={Link} to="/join" sx={{ mt: 2 }}>Join another</Button>
-        </Box>
-      )}
+        {state.phase === "over" && (
+          <Box className="text-center">
+            <Typography variant="h5">Game Over!</Typography>
+            <ol>{state.leaderboard.map((p, i) => <li key={i}>{p.name} — {p.score}</li>)}</ol>
+            <Button component={Link} to="/join" variant="contained"
+              sx={{ mt: 3, backgroundColor: "#64748B", "&:hover": { backgroundColor: "#475569" } }}>
+              Join Another
+            </Button>
+          </Box>
+        )}
+      </Card>
     </Box>
-  )
+  );
 }
