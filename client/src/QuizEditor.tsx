@@ -900,6 +900,285 @@
 //   );
 // }
 
+// import React, { useState } from "react";
+// import { Editor } from "@tinymce/tinymce-react";
+// import { Button } from "./components/ui/button";
+// import { Input } from "./components/ui/input";
+// import { Card } from "./components/ui/card";
+// import { Checkbox } from "./components/ui/checkbox";
+// import { Plus, Bold, Italic, AlignLeft, AlignCenter, AlignRight, List, Link, Image, Maximize2, Code, X } from 'lucide-react';
+// import GameLayout from './components/GameLayout'; 
+
+
+// // NOTE: Define the structure for the final question data
+// interface Question {
+//   text: string;
+//   choices: string[];
+//   correctIndices: number[];
+//   timeLimitSec: number;
+// }
+
+// interface QuizCreatorProps {
+//   onSave: (quizData: { questions: Question[] }) => void;
+// }
+
+// export default function QuizCreator({ onSave }: QuizCreatorProps) {
+//   const [questions, setQuestions] = useState<Question[]>([]);
+//   const [currentQuestion, setCurrentQuestion] = useState<Question>({
+//     text: "",
+//     choices: ["", "", "", ""],
+//     correctIndices: [], // Array for multiple correct answers
+//     timeLimitSec: 15,
+//   });
+
+//   // --- Handlers for Current Question State ---
+
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value } = e.target;
+//     // For time limit, ensure it's a number
+//     if (name === "timeLimitSec") {
+//       setCurrentQuestion(prev => ({ ...prev, [name]: Number(value) }));
+//     } else {
+//       setCurrentQuestion(prev => ({ ...prev, [name]: value }));
+//     }
+//   };
+
+//   const handleEditorChange = (content: string) => {
+//     setCurrentQuestion(prev => ({ ...prev, text: content }));
+//   };
+
+//   const handleChoiceChange = (index: number, value: string) => {
+//     const newChoices = [...currentQuestion.choices];
+//     newChoices[index] = value;
+//     setCurrentQuestion(prev => ({ ...prev, choices: newChoices }));
+//   };
+
+//   const toggleCorrectAnswer = (index: number) => {
+//     const { correctIndices } = currentQuestion;
+//     const newCorrectIndices = correctIndices.includes(index)
+//       ? correctIndices.filter((i) => i !== index)
+//       : [...correctIndices, index];
+//     setCurrentQuestion(prev => ({ ...prev, correctIndices: newCorrectIndices }));
+//   };
+
+//   // --- Action Functions ---
+
+//   const addQuestion = () => {
+//     // Validation logic
+//     if (!currentQuestion.text || currentQuestion.choices.some((c) => !c) || currentQuestion.correctIndices.length === 0) {
+//       alert("Please fill in the question, all four choices, and select at least one correct answer.");
+//       return;
+//     }
+//     setQuestions([...questions, currentQuestion]);
+    
+//     // Reset for the next question
+//     setCurrentQuestion({
+//       text: "",
+//       choices: ["", "", "", ""],
+//       correctIndices: [],
+//       timeLimitSec: 15,
+//     });
+//   };
+
+//   const handleRemoveQuestion = (indexToRemove: number) => {
+//     setQuestions(questions.filter((_, index) => index !== indexToRemove));
+//   };
+  
+//   const handleEndQuiz = () => {
+//     // Validation for the question currently being edited
+//     const isCurrentQuestionValid = 
+//         currentQuestion.text && 
+//         currentQuestion.choices.every(c => c.trim()) && 
+//         currentQuestion.correctIndices.length > 0;
+    
+//     let finalQuestions = [...questions];
+
+//     // Include the current question if it's valid
+//     if (isCurrentQuestionValid) {
+//         finalQuestions.push(currentQuestion);
+//     }
+    
+//     if (finalQuestions.length === 0) {
+//         alert("Please add at least one valid question before ending the quiz.");
+//         return;
+//     }
+    
+//     onSave({ questions: finalQuestions });
+//   };
+
+//   // The 'key' on the Editor component ensures it clears when a new question is added.
+//   const editorKey = questions.length; 
+
+//   return (
+//     <div className="max-w-4xl mx-auto p-6 space-y-6 flex flex-col items-center">
+
+
+      
+//       {/* Create or Use Sample Quiz Section (Kept for UI consistency) */}
+//       <Card className="p-6 bg-[#F8FAFC]/95 backdrop-blur-sm border border-[#BCCCDC]/40 shadow-xl w-full">
+//         <div className="text-center">
+//           <h2 className="text-xl font-semibold text-[#64748B] mb-4">Create or Use Sample Quiz</h2>
+//           <Button variant="outline" className="border-[#64748B] text-[#64748B] hover:bg-[#D9EAFD] hover:border-[#64748B]">
+//             Use Sample Quiz
+//           </Button>
+//         </div>
+//       </Card>
+
+//       {/* Add Questions Section */}
+//       <Card className="p-6 bg-[#F8FAFC]/95 backdrop-blur-sm border border-[#BCCCDC]/40 shadow-xl w-full">
+//         <div className="text-center mb-6">
+//           <h2 className="text-xl font-semibold text-[#64748B] mb-4">
+//             Add Questions ({questions.length})
+//           </h2>
+//         </div>
+
+//         {/* Question Text Editor (TinyMCE Integration) */}
+//         <div className="mb-6">
+//           <label className="block text-sm font-medium text-[#64748B] mb-2">
+//             Question Text:
+//           </label>
+            
+//           {/* Custom Toolbar - Renders as static buttons */}
+//           <div className="flex items-center space-x-1 p-2 border border-[#BCCCDC] rounded-t-md bg-[#D9EAFD]">
+//             <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><Bold className="h-4 w-4" /></Button>
+//             <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><Italic className="h-4 w-4" /></Button>
+//             <div className="w-px h-6 bg-gray-300 mx-1" />
+//             <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><AlignLeft className="h-4 w-4" /></Button>
+//             <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><AlignCenter className="h-4 w-4" /></Button>
+//             <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><AlignRight className="h-4 w-4" /></Button>
+//             <div className="w-px h-6 bg-gray-300 mx-1" />
+//             <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><List className="h-4 w-4" /></Button>
+//             <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><Link className="h-4 w-4" /></Button>
+//             <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><Image className="h-4 w-4" /></Button>
+//             <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><Maximize2 className="h-4 w-4" /></Button>
+//             <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><Code className="h-4 w-4" /></Button>
+//             <div className="ml-auto">
+//               <span className="text-xs bg-gray-700 text-white px-2 py-1 rounded">
+//                 Editor below
+//               </span>
+//             </div>
+//           </div>
+          
+//           <Editor
+//             apiKey="0gn1nl2pcgdtjpnb3b8iyodwu7az8ldbkqxpa75qztjwti0q" // Replace with your actual key
+//             key={editorKey} 
+//             // initialValue={currentQuestion.text}
+//             onEditorChange={handleEditorChange}
+//             init={{
+//                 height: 300,
+//                 menubar: false,
+//                 plugins: "link lists image code fullscreen emoticons",
+//                 toolbar: "undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | fullscreen | code",
+//                 // Tailwind CSS compatibility fixes
+//                 content_style: 'body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; }'
+//             }}
+//           />
+//         </div>
+
+//         {/* Time Limit */}
+//         <div className="mb-6">
+//           <label className="block text-sm font-medium text-[#64748B] mb-2">
+//             Time Limit (sec):
+//           </label>
+//           <Input
+//             type="number"
+//             name="timeLimitSec"
+//             value={currentQuestion.timeLimitSec}
+//             onChange={handleInputChange}
+//             className="w-24 focus:ring-[#64748B] focus:border-[#64748B] bg-white"
+//             min="5"
+//             max="180"
+//           />
+//         </div>
+
+//         {/* Answer Choices */}
+//         <div className="mb-6">
+//           <label className="block text-sm font-medium text-[#64748B] mb-3">
+//             Answer Choices (Select correct with checkbox):
+//           </label>
+//           <div className="space-y-3">
+//             {currentQuestion.choices.map((choice, index) => (
+//               <div key={index} className="flex items-center space-x-3">
+//                 <Checkbox
+//                   checked={currentQuestion.correctIndices.includes(index)}
+//                   onCheckedChange={() => toggleCorrectAnswer(index)}
+//                   className="border-[#64748B] data-[state=checked]:bg-[#64748B] data-[state=checked]:border-[#64748B]"
+//                 />
+//                 <Input
+//                   value={choice}
+//                   onChange={(e) => handleChoiceChange(index, e.target.value)}
+//                   placeholder={`Option ${index + 1}:`}
+//                   className="flex-1 focus:ring-[#64748B] focus:border-[#64748B] bg-white"
+//                 />
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+
+//         {/* Action Buttons */}
+//         <div className="flex items-center justify-center space-x-3">
+//           <Button
+//             onClick={addQuestion}
+//             className="bg-[#64748B] hover:bg-[#64748B]/90 text-white shadow-lg hover:shadow-xl transition-all"
+//           >
+//             <Plus className="h-4 w-4 mr-2" />
+//             Add Question
+//           </Button>
+//           <Button
+//             variant="outline"
+//             onClick={handleEndQuiz}
+//             className="border-[#64748B] text-[#64748B] hover:bg-[#D9EAFD] hover:border-[#64748B] shadow-lg hover:shadow-xl transition-all"
+//             disabled={questions.length === 0 && (!currentQuestion.text || currentQuestion.correctIndices.length === 0)}
+//           >
+//             End Quiz and Create Room
+//           </Button>
+//         </div>
+//       </Card>
+
+//       {/* Questions List */}
+//       {questions.length > 0 && (
+//         <Card className="p-6 bg-[#F8FAFC]/95 backdrop-blur-sm border border-[#BCCCDC]/40 shadow-xl w-full">
+//           <div className="text-center mb-4">
+//             <h3 className="text-lg font-semibold text-[#64748B]">Added Questions</h3>
+//           </div>
+//           <div className="space-y-4">
+//             {questions.map((question, index) => (
+//               <div key={index} className="p-4 border border-[#BCCCDC] rounded-lg bg-white/70">
+//                 <div className="flex items-start justify-between">
+//                   <div className="flex-1">
+//                     <h4 className="font-medium text-[#64748B] mb-2">
+//                       Question {index + 1}: <span dangerouslySetInnerHTML={{ __html: question.text }} />
+//                     </h4>
+//                     <p className="text-sm text-[#64748B]/80 mb-2">
+//                       Time Limit: {question.timeLimitSec} seconds
+//                     </p>
+//                     <div className="text-sm text-[#64748B]/80">
+//                       Options: {question.choices.filter(opt => opt.trim()).join(' / ')}
+//                     </div>
+//                     <div className="text-xs mt-1 font-semibold text-green-600">
+//                       Correct: {question.correctIndices.map(i => question.choices[i]).join('; ')}
+//                     </div>
+//                   </div>
+//                   <Button 
+//                     variant="ghost" 
+//                     size="sm" 
+//                     onClick={() => handleRemoveQuestion(index)}
+//                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
+//                   >
+//                     <X className="h-4 w-4" />
+//                   </Button>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </Card>
+//       )}
+//     </div>
+//   );
+// }
+
+
+
 import React, { useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { Button } from "./components/ui/button";
